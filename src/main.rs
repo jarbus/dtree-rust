@@ -1,13 +1,15 @@
-extern crate glutin_window;
+//extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
+
+//use winit::{Event, EventsLoop, Window, WindowEvent, ControlFlow};
 
 
 extern crate piston_window;
 use piston_window::*;
 
-use glutin_window::GlutinWindow as Window;
+//use glutin_window::GlutinWindow as Window;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::{EventSettings, Events};
 use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
@@ -65,20 +67,18 @@ fn main() {
 
     let mut change_pos = false;
     // Create an Glutin window.
-    let mut window: Window = WindowSettings::new("spinning-square", [200, 200])
+    let mut window: PistonWindow = WindowSettings::new("spinning-square", [200, 200])
         .graphics_api(opengl)
         .exit_on_esc(true)
         .build()
         .unwrap();
 
-    //let size = window.inner_size();
-    //let (mut x_size, mut y_size) = (size.width, size.height);
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
         rotation: 0.0,
-        pos: [0.0, 0.0],
-        window_size: [0.0, 0.0],
+        pos: [0.5, 0.5],
+        window_size: [window.size().width, window.size().height],
     };
 
     let mut events = Events::new(EventSettings::new());
