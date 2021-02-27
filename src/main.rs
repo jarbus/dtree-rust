@@ -33,7 +33,7 @@ impl App {
 
         let square = rectangle::square(0.0, 0.0, 50.0);
         let rotation = self.rotation;
-        let (x, y) = (self.pos[0], self.pos[1]) ;
+        let (x, y) = (self.pos[0] * args.window_size[0], self.pos[1] * args.window_size[1]) ;
         self.window_size = [args.window_size[0], args.window_size[1]];
 
         // |c , gl| {} is a closure, which is like an anonymous fun
@@ -100,7 +100,7 @@ fn main() {
         if change_pos {
             if let Some(pos) = e.mouse_cursor_args() {
                 let (x, y) = (pos[0], pos[1]);
-                app.pos = [x, y];
+                app.pos = [x / app.window_size[0], y / app.window_size[1]];
                 change_pos = false;
             }
         }
