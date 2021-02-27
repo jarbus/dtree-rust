@@ -96,6 +96,9 @@ fn main() {
                 change_pos = true;
 
             }
+            else if button == Button::Keyboard(Key::B){
+                println!("B has been pressed");
+            }
         }
         if change_pos {
             if let Some(pos) = e.mouse_cursor_args() {
