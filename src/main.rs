@@ -20,13 +20,25 @@ use piston::window::WindowSettings;
 // App data
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
-    rotation: f64,  // Rotation for the square.
-    pos: [f64; 2],
-    window_size: [f64; 2]
+    window_size: [f64; 2],
+    nodes: Vec<Node>,
+}
+pub struct Node {
+   shape: [f64; 4],
+   color: [f32; 4],
+   pos: [f64; 2],
+   rot: f64,
 }
 
-const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
-const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
+
+fn create_transform(c: Context, node: &Node){
+    c.transform
+        .trans(node.pos[0], node.pos[1])
+        .rot_rad(node.rot);
+}
+
+const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
+const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 
 // App functions
 impl App {
@@ -34,30 +46,37 @@ impl App {
 
 
         let square = rectangle::square(0.0, 0.0, 50.0);
-        let rotation = self.rotation;
-        let (x, y) = (self.pos[0] * args.window_size[0], self.pos[1] * args.window_size[1]) ;
+
         self.window_size = [args.window_size[0], args.window_size[1]];
 
         // |c , gl| {} is a closure, which is like an anonymous fun
         // https://doc.rust-lang.org/rust-by-example/fn/closures.html
         self.gl.draw(args.viewport(), |c, gl| {
             // Clear the screen.
-            clear(GREEN, gl);
+            clear(BLACK, gl);
 
-            let transform = c
-                .transform
-                .trans(x, y)
-                .rot_rad(rotation)
-                .trans(-25.0, -25.0);
+            for node in &self.nodes {
+                println!("iterating");
 
-            // Draw a box rotating around the middle of the screen.
-            rectangle(RED, square, transform, gl);
+                let (x, y) = (node.pos[0] * self.window_size[0], node.pos[1] * self.window_size[1]);
+
+                let transform = c
+                    .transform
+                    .trans(x, y)
+                    .rot_rad(node.rot);
+
+                // Draw a box rotating around the middle of the screen.
+                rectangle(WHITE, square, transform, gl);
+            }
+
         });
     }
 
     fn update(&mut self, args: &UpdateArgs) {
         // Rotate 2 radians per second.
-        self.rotation += 2.0 * args.dt;
+        for node in &self.nodes{
+            node.rot = node.rot + 2.0 * args.dt;
+        }
     }
 }
 
@@ -73,12 +92,18 @@ fn main() {
         .build()
         .unwrap();
 
+    let node1 = Node {
+        shape: rectangle::square(0.0, 0.0, 50.0),
+        color: WHITE,
+        pos: [0.0, 0.0],
+        rot: 0.0};
+    let node_vec = vec![node1];
+
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
-        rotation: 0.0,
-        pos: [0.5, 0.5],
         window_size: [window.size().width, window.size().height],
+        nodes: node_vec
     };
 
     let mut events = Events::new(EventSettings::new());
@@ -103,7 +128,7 @@ fn main() {
         if change_pos {
             if let Some(pos) = e.mouse_cursor_args() {
                 let (x, y) = (pos[0], pos[1]);
-                app.pos = [x / app.window_size[0], y / app.window_size[1]];
+                app.nodes[0].pos = [x / app.window_size[0], y / app.window_size[1]];
                 change_pos = false;
             }
         }
