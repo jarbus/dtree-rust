@@ -1,222 +1,105 @@
-//extern crate glutin_window;
-extern crate graphics;
-extern crate opengl_graphics;
+//! A Roguelike Game using Piston Engine
+
 extern crate piston;
 
-//use winit::{Event, EventsLoop, Window, WindowEvent, ControlFlow};
+extern crate graphics;
+extern crate opengl_graphics;
 
+use glutin_window::GlutinWindow;
+use piston::WindowSettings;
 
-extern crate piston_window;
-use piston_window::*;
+use piston::event_loop::{EventLoop, EventSettings, Events};
+use piston::RenderEvent;
 
-//use glutin_window::GlutinWindow as Window;
+use graphics::types::{Rectangle, Polygon};
+
 use opengl_graphics::{GlGraphics, OpenGL};
-use piston::event_loop::{EventSettings, Events};
-use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent};
-use piston::window::WindowSettings;
 
-//use graphics::*;
+//use types::{Rectangle, Ellipse};
 
-// App data
+type Color = [f64; 4];
+
+const RED: Color = [1.0, 0.0, 0.0, 1.0];
+const GREEN: Color = [0.0, 1.0, 0.0, 1.0];
+const BLUE: Color = [0.0, 0.0, 1.0, 1.0];
+const WHITE: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+const BLACK: Color = [0.0, 0.0, 0.0, 1.0];
+
+const WINDOW_SIZE: i32 = 512;
+const PIXEL_SIZE: f64 = 32.0;
+const WORLD_SIZE: i32 = WINDOW_SIZE / PIXEL_SIZE as i32;
+
+
+
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
     window_size: [f64; 2],
     nodes: Vec<Node>,
 }
+
 pub struct Node {
-   shape: [f64; 4],
-   color: [f32; 4],
+   shape: Result<graphics::Rectangle,graphics::CircleArc>,
    pos: [f64; 2],
    rot: f64,
 }
 
 
-fn create_transform(c: Context, node: &Node){
-    c.transform
-        .trans(node.pos[0], node.pos[1])
-        .rot_rad(node.rot);
-}
+impl Node {
+    pub fn new_rec(self) -> Self {
+        Node {
+            shape: graphics::Rectangle::new(WHITE) ,
 
-const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
-const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
-
-// App functions
-impl App {
-    fn render(&mut self, args: &RenderArgs) {
-
-
-        let square = rectangle::square(0.0, 0.0, 50.0);
-
-        self.window_size = [args.window_size[0], args.window_size[1]];
-
-        // |c , gl| {} is a closure, which is like an anonymous fun
-        // https://doc.rust-lang.org/rust-by-example/fn/closures.html
-        self.gl.draw(args.viewport(), |c, gl| {
-            // Clear the screen.
-            clear(BLACK, gl);
-
-            for node in &self.nodes {
-                println!("iterating");
-
-                let (x, y) = (node.pos[0] * self.window_size[0], node.pos[1] * self.window_size[1]);
-
-                let transform = c
-                    .transform
-                    .trans(x, y)
-                    .rot_rad(node.rot);
-
-                // Draw a box rotating around the middle of the screen.
-                rectangle(WHITE, square, transform, gl);
-            }
-
-        });
-    }
-
-    fn update(&mut self, args: &UpdateArgs) {
-        // Rotate 2 radians per second.
-        for node in &self.nodes{
-            node.rot = node.rot + 2.0 * args.dt;
+            pos: [0.0, 0.0],
+            rot: 0.0,
         }
     }
+    pub fn new_circle(self) -> Self {
+        Node {
+            shape: graphics::CircleArc::new(WHITE,100.0,0.0,2.0),
+            pos: [0.0, 0.0],
+            rot: 0.0
+        }
+    }
+}
+
+
+type Map = Vec<Vec<Node>>;
+
+fn make_map() -> Map {
+    let mut map = vec![vec![Node::new_rec(); WORLD_SIZE as usize]; WORLD_SIZE as usize];
+    map
 }
 
 fn main() {
-    // Change this to OpenGL::V2_1 if not working.
     let opengl = OpenGL::V3_2;
-
-    let mut change_pos = false;
-    // Create an Glutin window.
-    let mut window: PistonWindow = WindowSettings::new("spinning-square", [200, 200])
-        .graphics_api(opengl)
-        .exit_on_esc(true)
-        .build()
-        .unwrap();
-
-    let node1 = Node {
-        shape: rectangle::square(0.0, 0.0, 50.0),
-        color: WHITE,
-        pos: [0.0, 0.0],
-        rot: 0.0};
-    let node_vec = vec![node1];
-
-    // Create a new game and run it.
-    let mut app = App {
-        gl: GlGraphics::new(opengl),
-        window_size: [window.size().width, window.size().height],
-        nodes: node_vec
-    };
-
+    let settings = WindowSettings::new("Roguelike", [512; 2]).exit_on_esc(true);
+    let mut window: GlutinWindow = settings.build().expect("Could not create window");
+    let mut gl = GlGraphics::new(opengl);
+    let map = make_map();
+    let nodes : Vec<Node> = vec![Node{s}];
     let mut events = Events::new(EventSettings::new());
     while let Some(e) = events.next(&mut window) {
-        if let Some(args) = e.render_args() {
-            app.render(&args);
-        }
+        if let Some(r) = e.render_args() {
+            gl.draw(r.viewport(), |c, g| {
+                graphics::clear(BLUE, g);
 
-        if let Some(args) = e.update_args() {
-            app.update(&args);
+                for i in 0..WORLD_SIZE {
+                    for j in 0..WORLD_SIZE {
+                        let pos: [f64; 4] = [
+                            PIXEL_SIZE * i as f64,
+                            PIXEL_SIZE * j as f64,
+                            PIXEL_SIZE * (i + 1) as f64,
+                            PIXEL_SIZE * (j + 1) as f64,
+                        ];
+                        graphics::Rectangle::new(map[i as usize][j as usize].color).draw(
+                            pos,
+                            &c.draw_state,
+                            c.transform,
+                            g,
+                        );
+                    }
+                }
+            });
         }
-
-        if let Some(button) = e.press_args() {
-            if button == Button::Mouse(MouseButton::Left) {
-                change_pos = true;
-
-            }
-            else if button == Button::Keyboard(Key::B){
-                println!("B has been pressed");
-            }
-        }
-        if change_pos {
-            if let Some(pos) = e.mouse_cursor_args() {
-                let (x, y) = (pos[0], pos[1]);
-                app.nodes[0].pos = [x / app.window_size[0], y / app.window_size[1]];
-                change_pos = false;
-            }
-        }
-    };
+    }
 }
-
-//extern crate piston_window;
-//extern crate image as im;
-//extern crate vecmath;
-//
-//use piston_window::*;
-//use vecmath::*;
-//
-//fn main() {
-//    let opengl = OpenGL::V3_2;
-//    let (mut width, mut height) = (300, 300);
-//    let mut window: PistonWindow =
-//        WindowSettings::new("piston: paint", (width, height))
-//        .exit_on_esc(true)
-//        .graphics_api(opengl)
-//        .build()
-//        .unwrap();
-//
-//    let mut canvas = im::ImageBuffer::new(width, height);
-//    let mut draw = false;
-//    let mut texture_context = TextureContext {
-//        factory: window.factory.clone(),
-//        encoder: window.factory.create_command_buffer().into()
-//    };
-//    let mut texture: G2dTexture = Texture::from_image(
-//            &mut texture_context,
-//            &canvas,
-//            &TextureSettings::new()
-//        ).unwrap();
-//
-//    let mut last_pos: Option<[f64; 2]> = None;
-//
-//    while let Some(e) = window.next() {
-//
-//        //let window_size = e.render_args().window_size;
-//        //width, height = window_size[0], window_size[1]
-//        if let Some(args) = e.render_args() {
-//            texture.update(&mut texture_context, &canvas).unwrap();
-//            width = args.window_size[0] as u32;
-//            height = args.window_size[1] as u32;
-//            window.draw_2d(&e, |c, g, device| {
-//                // Update texture before rendering.
-//                texture_context.encoder.flush(device);
-//
-//                clear([1.0; 4], g);
-//                image(&texture, c.transform, g);
-//            });
-//        }
-//        if let Some(button) = e.press_args() {
-//            if button == Button::Mouse(MouseButton::Left) {
-//                draw = true;
-//            }
-//        };
-//        if let Some(button) = e.release_args() {
-//            if button == Button::Mouse(MouseButton::Left) {
-//                draw = false;
-//                last_pos = None
-//            }
-//        };
-//        if draw {
-//            if let Some(pos) = e.mouse_cursor_args() {
-//                let (x, y) = (pos[0] as f32, pos[1] as f32);
-//
-//                if let Some(p) = last_pos {
-//                    let (last_x, last_y) = (p[0] as f32, p[1] as f32);
-//                    let distance = vec2_len(vec2_sub(p, pos)) as u32;
-//
-//                    for i in 0..distance {
-//                        let diff_x = x - last_x;
-//                        let diff_y = y - last_y;
-//                        let delta = i as f32 / distance as f32;
-//                        let new_x = (last_x + (diff_x * delta)) as u32;
-//                        let new_y = (last_y + (diff_y * delta)) as u32;
-//                        println!("putting pixel if {} < {} && {} < {}",new_x,width,new_y,height);
-//                        if new_x < width && new_y < height {
-//                            canvas.put_pixel(new_x, new_y, im::Rgba([0, 255, 0, 255]));
-//                        };
-//                    };
-//                };
-//
-//                last_pos = Some(pos)
-//            };
-//
-//        }
-//    }
-//}
