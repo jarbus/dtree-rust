@@ -5,13 +5,17 @@ extern crate piston;
 extern crate graphics;
 extern crate opengl_graphics;
 
+
+#[macro_use]
+extern crate sum_type;
+
 use glutin_window::GlutinWindow;
 use piston::WindowSettings;
 
+
+
 use piston::event_loop::{EventLoop, EventSettings, Events};
 use piston::RenderEvent;
-
-use graphics::types::{Rectangle, Polygon};
 
 use opengl_graphics::{GlGraphics, OpenGL};
 
@@ -22,7 +26,7 @@ type Color = [f64; 4];
 const RED: Color = [1.0, 0.0, 0.0, 1.0];
 const GREEN: Color = [0.0, 1.0, 0.0, 1.0];
 const BLUE: Color = [0.0, 0.0, 1.0, 1.0];
-const WHITE: [f64; 4] = [1.0, 1.0, 1.0, 1.0];
+const WHITE: [f32; 4] = [1.0, 1.0, 1.0, 1.0];
 const BLACK: Color = [0.0, 0.0, 0.0, 1.0];
 
 const WINDOW_SIZE: i32 = 512;
@@ -37,28 +41,35 @@ pub struct App {
     nodes: Vec<Node>,
 }
 
+sum_type!{
+    #[derive(Clone)]
+    pub enum Shape {
+        Rectangle(graphics::rectangle::Rectangle),
+        Circle(graphics::circle_arc::CircleArc),
+    }
+}
+
+
+#[derive(Clone)]
 pub struct Node {
-   shape: Result<graphics::Rectangle,graphics::CircleArc>,
+   shape: Shape,
    pos: [f64; 2],
    rot: f64,
 }
 
 
-impl Node {
-    pub fn new_rec(self) -> Self {
-        Node {
-            shape: graphics::Rectangle::new(WHITE) ,
-
-            pos: [0.0, 0.0],
-            rot: 0.0,
-        }
+pub fn new_rec() -> Node {
+    Node {
+        shape: Shape::Rectangle(graphics::Rectangle::new(WHITE)) ,
+        pos: [0.0, 0.0],
+        rot: 0.0,
     }
-    pub fn new_circle(self) -> Self {
-        Node {
-            shape: graphics::CircleArc::new(WHITE,100.0,0.0,2.0),
-            pos: [0.0, 0.0],
-            rot: 0.0
-        }
+}
+pub fn new_circle() -> Node {
+    Node {
+        shape: Shape::Circle(graphics::CircleArc::new(WHITE,100.0,0.0,2.0)),
+        pos: [0.0, 0.0],
+        rot: 0.0
     }
 }
 
@@ -66,7 +77,7 @@ impl Node {
 type Map = Vec<Vec<Node>>;
 
 fn make_map() -> Map {
-    let mut map = vec![vec![Node::new_rec(); WORLD_SIZE as usize]; WORLD_SIZE as usize];
+    let mut map = vec![vec![new_rec(); WORLD_SIZE as usize]; WORLD_SIZE as usize];
     map
 }
 
