@@ -27,6 +27,7 @@ fn main() {
     while let Some(e) = events.next(&mut window) {
         // Draws screen on render event
         if let Some(r) = e.render_args() {
+            //window_size = r.viewport().window_size;
             gl.draw(r.viewport(), |c, gl| {
                 graphics::clear(color::BLACK, gl);    // clear screen
                 graph.draw(c,gl);                     // render graph
