@@ -4,12 +4,7 @@ extern crate opengl_graphics;
 
 
 use glutin_window::GlutinWindow;
-use piston::WindowSettings;
-
-
-use piston::input::{RenderArgs, RenderEvent, UpdateArgs, UpdateEvent, PressEvent, Button, ButtonState, Key, MouseButton};
-use piston::event_loop::{EventLoop, EventSettings, Events};
-use piston::{ButtonEvent, RenderEvent};
+use piston_window::*;
 
 use opengl_graphics::{GlGraphics, OpenGL };
 
@@ -48,10 +43,10 @@ impl Node{
             }
         }
     }
-    fn new(start_shape: Shape) -> Node {
+    fn new(start_shape: Shape, x:f64, y:f64) -> Node {
         Node {
             shape: start_shape,
-            pos: [0.5, 0.5],
+            pos: [x, y],
             rot: 0.0,
             size: 100.0,
         }
@@ -61,7 +56,7 @@ impl Node{
 type Graph = Vec<Node>;
 
 fn make_graph() -> Graph {
-    let graph = vec![Node::new(Shape::Rect); 1];
+    let graph = vec![Node::new(Shape::Rect,0.5, 0.5); 1];
     graph
 }
 
@@ -70,24 +65,30 @@ fn main() {
     let settings = WindowSettings::new("Roguelike", [512; 2]).exit_on_esc(true);
     let mut window: GlutinWindow = settings.build().expect("Could not create window");
     let mut gl = GlGraphics::new(opengl);
-    let graph = make_graph();
-    let mut events = Events::new(EventSettings::new().lazy(true));
+    let mut graph = make_graph();
+    let mut events = Events::new(EventSettings::new());
+    let mut cursor: [f64; 2] = [0.0, 0.0];
+    let mut window_size: [f64; 2] = [0.0,0.0];
     while let Some(e) = events.next(&mut window) {
         if let Some(r) = e.render_args() {
+            window_size = r.viewport().window_size;
             gl.draw(r.viewport(), |c, gl| {
+                window_size = r.viewport().window_size;
                 graphics::clear(BLACK, gl);
                 for i in 0..graph.len() {
                     graph[i].draw(c,gl);
                 }
             });
         }
-
+        if let Some(pos) = e.mouse_cursor_args() {
+            cursor = pos;
+        }
         if let Some(button) = e.press_args() {
-            if button == Button::Mouse(MouseButton::Left) {
-
-            }
-            else if button == Button::Keyboard(Key::B){
-                println!("B has been pressed");
+            match button {
+                Button::Mouse(MouseButton::Left) => graph.push(Node::new(Shape::Rect, cursor[0]/window_size[0], cursor[1]/window_size[1])),
+                Button::Mouse(MouseButton::Right) => graph.clear(),
+                Button::Keyboard(Key::B) => println!("B has been pressed"),
+                _ => {},
             }
         }
     }
