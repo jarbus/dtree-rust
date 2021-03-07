@@ -15,6 +15,7 @@ include!("graph.rs");
 
 
 fn main() {
+
     let opengl = OpenGL::V3_2;
     let settings = WindowSettings::new("dtree", [512; 2]).exit_on_esc(true);
     let mut window: GlutinWindow = settings.build().expect("Could not create window");
@@ -39,6 +40,7 @@ fn main() {
         //if let Some(pos) = e.mouse_cursor_args() {
         //    cursor = pos;                             // get new cursor position each tick
         //}
+
         if let Some(button) = e.press_args() {
 
             match button {
