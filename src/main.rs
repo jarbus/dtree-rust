@@ -90,7 +90,7 @@ impl Graph{
 fn main() {
 
     let opengl = OpenGL::V3_2;
-    let settings = WindowSettings::new("Roguelike", [512; 2]).exit_on_esc(true);
+    let settings = WindowSettings::new("dtree", [512; 2]).exit_on_esc(true);
     let mut window: GlutinWindow = settings.build().expect("Could not create window");
     let mut gl = GlGraphics::new(opengl);
     let mut graph: Graph = Graph::new();
