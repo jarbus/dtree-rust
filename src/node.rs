@@ -1,5 +1,3 @@
-pub type Color = [f32; 4];
-
 #[derive(Clone)]
 pub enum Shape {
     Rect,
@@ -8,11 +6,11 @@ pub enum Shape {
 
 #[derive(Clone)]
 pub struct Node {
-   shape: Shape,
-   color: Color,
-   pos: [f64; 2],
-   rot: f32,
-   size: f64,
+   pub shape: Shape,
+   pub color: Color,
+   pub pos: [f64; 2],
+   pub rot: f32,
+   pub size: f64,
 }
 
 impl Node{
@@ -30,7 +28,7 @@ impl Node{
     pub fn new(start_shape: Shape, x:f64, y:f64) -> Node {
         Node {
             shape: start_shape,
-            color: color::WHITE,
+            color: WHITE,
             pos: [x, y],
             rot: 0.0,
             size: 100.0,

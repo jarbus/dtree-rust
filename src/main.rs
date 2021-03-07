@@ -2,23 +2,23 @@ extern crate piston;
 extern crate graphics;
 extern crate opengl_graphics;
 
-
 use glutin_window::GlutinWindow;
 use piston_window::*;
-use opengl_graphics::{GLGraphics, OpenGL};
-
+use opengl_graphics::{GlGraphics, OpenGL};
 use piston::input::{RenderEvent, PressEvent, Button, Key, MouseButton};
 use piston::event_loop::{EventSettings, Events};
 
 
-mod graph;
-use graph::Graph;
+include!("color.rs");
+include!("node.rs");
+include!("graph.rs");
+
 
 fn main() {
     let opengl = OpenGL::V3_2;
     let settings = WindowSettings::new("Roguelike", [512; 2]).exit_on_esc(true);
     let mut window: GlutinWindow = settings.build().expect("Could not create window");
-    let mut gl = GLGraphics::new(opengl);
+    let mut gl = GlGraphics::new(opengl);
     let mut graph: Graph = Graph::new();
     let mut events = Events::new(EventSettings::new());
     let mut cursor: [f64; 2] = [0.0, 0.0];          // cursor position in pixel coordinates
@@ -45,7 +45,7 @@ fn main() {
         if let Some(button) = e.press_args() {
             match button {
                 // Add new node to graph on left click at cursor position
-                Button::Mouse(MouseButton::Left) => graph.nodes.push(node::Node::new(node::Shape::Circle, cursor[0]/window_size[0], cursor[1]/window_size[1])),
+                Button::Mouse(MouseButton::Left) => graph.nodes.push(Node::new(Shape::Circle, cursor[0]/window_size[0], cursor[1]/window_size[1])),
                 // Clear all nodes on right click
                 Button::Mouse(MouseButton::Right) => graph.nodes.clear(),
                 Button::Keyboard(Key::K) => graph.select(graph.selected as i8 + 1),

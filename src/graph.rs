@@ -1,6 +1,3 @@
-mod node;
-use node::Node;
-
 #[derive(Clone)]
 pub struct Graph {
     pub nodes: Vec<Node>,
