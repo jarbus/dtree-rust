@@ -1,3 +1,4 @@
+// TODO add position offset to rendering a node
 extern crate piston;
 extern crate graphics;
 extern crate opengl_graphics;
@@ -8,7 +9,6 @@ use opengl_graphics::{GlGraphics, OpenGL};
 use piston::input::{RenderEvent, PressEvent, Button, Key, MouseButton};
 use piston::event_loop::{EventSettings, Events};
 
-
 include!("color.rs");
 include!("node.rs");
 include!("graph.rs");
@@ -16,7 +16,7 @@ include!("graph.rs");
 
 fn main() {
     let opengl = OpenGL::V3_2;
-    let settings = WindowSettings::new("Roguelike", [512; 2]).exit_on_esc(true);
+    let settings = WindowSettings::new("dtree", [512; 2]).exit_on_esc(true);
     let mut window: GlutinWindow = settings.build().expect("Could not create window");
     let mut gl = GlGraphics::new(opengl);
     let mut graph: Graph = Graph::new();
@@ -31,11 +31,10 @@ fn main() {
             gl.draw(r.viewport(), |c, gl| {
                 graphics::clear(color::BLACK, gl);         // clear screen
                 for i in 0..graph.nodes.len() {     // draw each node
-                    graph.nodes[i].draw(c,gl);
+                    graph.nodes[i].draw(c,gl, graph.nodes[graph.selected].pos);
                 }
             });
         }
-
         if let Some(resize_event) = e.resize_args() { // update window_size every
             window_size = resize_event.window_size;   // time it's changed
         }
@@ -43,11 +42,13 @@ fn main() {
             cursor = pos;                             // get new cursor position each tick
         }
         if let Some(button) = e.press_args() {
+
+            let sel_pos = graph.nodes[graph.selected].pos;
             match button {
                 // Add new node to graph on left click at cursor position
-                Button::Mouse(MouseButton::Left) => graph.nodes.push(Node::new(Shape::Circle, cursor[0]/window_size[0], cursor[1]/window_size[1])),
+                Button::Keyboard(Key::O) => graph.nodes.push(Node::new(Shape::Circle, sel_pos[0], sel_pos[1] - 0.2)),
                 // Clear all nodes on right click
-                Button::Mouse(MouseButton::Right) => graph.nodes.clear(),
+                Button::Mouse(MouseButton::Right) => graph.reset(),
                 Button::Keyboard(Key::K) => graph.select(graph.selected as i8 + 1),
                 Button::Keyboard(Key::J) => graph.select(graph.selected as i8 - 1),
                 _ => {},

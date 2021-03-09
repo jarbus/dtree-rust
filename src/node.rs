@@ -14,10 +14,10 @@ pub struct Node {
 }
 
 impl Node{
-    pub fn draw(&self, c: graphics::context::Context, gl: &mut GlGraphics) {
+    pub fn draw(&self, c: graphics::context::Context, gl: &mut GlGraphics, position: [f64; 2]) {
         if let Some(v) = c.viewport{
-            let x0 = (self.pos[0] * v.window_size[0]) - (self.size/2.0);
-            let y0 = (self.pos[1] * v.window_size[1]) - (self.size/2.0);
+            let x0 = ((0.5 + (position[0] - self.pos[0])) * v.window_size[0]) - (self.size/2.0);
+            let y0 = ((0.5 + (position[1] - self.pos[1])) * v.window_size[1]) - (self.size/2.0);
 
             match self.shape {
                 Shape::Rect => graphics::Rectangle::new(self.color).draw([x0, y0,self.size, self.size], &c.draw_state, c.transform, gl),

@@ -5,7 +5,10 @@ pub struct Graph {
 }
 impl Graph{
     pub fn new() -> Graph {
-        Graph { nodes: vec![Node::new(Shape::Circle,0.5, 0.5); 1], selected:0}
+        let mut g: Graph = Graph { nodes: vec![], selected:0};
+        g.reset();
+        return g
+
     }
     // Function to change selected node to the node at the new_selection position in the self.nodes
     pub fn select(&mut self, new_selection: i8){
@@ -23,5 +26,11 @@ impl Graph{
         self.nodes[self.selected as usize].color = DEFAULT_NODE_COLOR;
         self.nodes[new_selection as usize].color = SELECTED_NODE_COLOR;
         self.selected = new_selection;
+    }
+    pub fn reset(&mut self){
+        self.nodes.clear();
+        self.nodes = vec![Node::new(Shape::Circle,0.5, 0.5); 1];
+        self.nodes[0].color = SELECTED_NODE_COLOR;
+        self.selected = 0;
     }
 }
