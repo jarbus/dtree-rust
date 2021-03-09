@@ -4,12 +4,25 @@ pub struct Graph {
     pub selected: usize,
 }
 impl Graph{
+
     pub fn new() -> Graph {
         let mut g: Graph = Graph { nodes: vec![], selected:0};
         g.reset();
         return g
 
     }
+
+    pub fn draw(&mut self, c: graphics::context::Context, gl: &mut GlGraphics){
+        for i in 0..self.nodes.len() {     // draw each node
+            self.nodes[i].draw(c,gl, self.nodes[self.selected].pos);
+        }
+
+    }
+
+    pub fn add_child(&mut self){
+        self.nodes.push(Node::new(Shape::Circle, self.nodes[self.selected].pos[0], self.nodes[self.selected].pos[1] - 0.2));
+    }
+
     // Function to change selected node to the node at the new_selection position in the self.nodes
     pub fn select(&mut self, new_selection: i8){
         // Here we handle cases where new_selection refers to an index outside of self.nodes
