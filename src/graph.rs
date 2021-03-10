@@ -24,20 +24,27 @@ impl Graph{
 
     pub fn add_child(&mut self){
 
-            self.max_id = self.max_id + 1;
-            self.nodes.insert(
-                self.max_id,
-                Node::new(Shape::Circle, self.nodes[&self.selected].pos[0], self.nodes[&self.selected].pos[1] - 0.2, self.max_id, self.selected));
-            match self.nodes.get_mut(&self.selected){
-                Some(sel) => sel.children.push(self.max_id),
-                _ => {}
-            };
+        self.max_id = self.max_id + 1;
+        let x_offset = match self.nodes[&self.selected].children.len() {
+            0 => 0.1,
+            1 => - 0.1,
+            _ => 0.0,
+        };
+        let child = Node::new(Shape::Circle, self.nodes[&self.selected].pos[0] + x_offset, self.nodes[&self.selected].pos[1] - 0.2, self.max_id, self.selected);
+        self.nodes.insert(
+            self.max_id,
+            child,
+            );
+        match self.nodes.get_mut(&self.selected){
+            Some(sel) => sel.children.push(self.max_id),
+            _ => {}
+        };
     }
 
     pub fn select(&mut self, new_selection: i8){
         let new_selection: usize = match new_selection {
             -1  => self.nodes[&self.selected].parent,
-            x if x < self.nodes.len() as i8 && x > 0 => self.nodes[&self.selected].children[(x-1) as usize],
+            x if x <= self.nodes[&self.selected].children.len() as i8 && x > 0 => self.nodes[&self.selected].children[(x-1) as usize],
             _ => self.selected,
             };
 
