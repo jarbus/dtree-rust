@@ -11,6 +11,9 @@ pub struct Node {
    pub pos: [f64; 2],
    pub rot: f32,
    pub size: f64,
+   pub id: usize,
+   pub parent: usize,
+   pub children: Vec<usize>,
 }
 
 impl Node{
@@ -25,13 +28,16 @@ impl Node{
             }
         }
     }
-    pub fn new(start_shape: Shape, x:f64, y:f64) -> Node {
+    pub fn new(start_shape: Shape, x:f64, y:f64, node_id: usize, parent_node: usize) -> Node {
         Node {
             shape: start_shape,
             color: WHITE,
             pos: [x, y],
             rot: 0.0,
             size: 100.0,
+            id: node_id,
+            parent: parent_node,
+            children: vec![],
         }
     }
 }

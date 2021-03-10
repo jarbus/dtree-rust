@@ -1,49 +1,62 @@
 #[derive(Clone)]
 pub struct Graph {
-    pub nodes: Vec<Node>,
+    pub nodes: HashMap<usize, Node>,
     pub selected: usize,
+    pub max_id: usize,
 }
+
+
 impl Graph{
 
     pub fn new() -> Graph {
-        let mut g: Graph = Graph { nodes: vec![], selected:0};
+        let mut g: Graph = Graph { nodes: HashMap::new(), selected:0, max_id: 0};
         g.reset();
         return g
 
     }
 
     pub fn draw(&mut self, c: graphics::context::Context, gl: &mut GlGraphics){
-        for i in 0..self.nodes.len() {     // draw each node
-            self.nodes[i].draw(c,gl, self.nodes[self.selected].pos);
+        for key in self.nodes.keys() {     // draw each node
+            self.nodes[key].draw(c,gl, self.nodes[&self.selected].pos);
         }
 
     }
 
     pub fn add_child(&mut self){
-        self.nodes.push(Node::new(Shape::Circle, self.nodes[self.selected].pos[0], self.nodes[self.selected].pos[1] - 0.2));
+
+            self.max_id = self.max_id + 1;
+            self.nodes.insert(
+                self.max_id,
+                Node::new(Shape::Circle, self.nodes[&self.selected].pos[0], self.nodes[&self.selected].pos[1] - 0.2, self.max_id, self.selected));
+            match self.nodes.get_mut(&self.selected){
+                Some(sel) => sel.children.push(self.max_id),
+                _ => {}
+            };
     }
 
-    // Function to change selected node to the node at the new_selection position in the self.nodes
     pub fn select(&mut self, new_selection: i8){
-        // Here we handle cases where new_selection refers to an index outside of self.nodes
-        // by having the index loop back around to the opposite side of the array
         let new_selection: usize = match new_selection {
-            // If goes past the last node in the vector, wrap it to the first
-            x if x >= self.nodes.len() as i8 => 0,
-            // If it goes below 0, wrap it to the last node in the vector
-            x if x < 0 => self.nodes.len() - 1,
-            _ => new_selection as usize,
+            -1  => self.nodes[&self.selected].parent,
+            x if x < self.nodes.len() as i8 && x > 0 => self.nodes[&self.selected].children[(x-1) as usize],
+            _ => self.selected,
             };
 
         // Unselect previous node, select new selection
-        self.nodes[self.selected as usize].color = DEFAULT_NODE_COLOR;
-        self.nodes[new_selection as usize].color = SELECTED_NODE_COLOR;
+        if let Some(prev_sel) = self.nodes.get_mut(&self.selected){
+            prev_sel.color = DEFAULT_NODE_COLOR;
+        }
+        if let Some(new_sel)  =  self.nodes.get_mut(&new_selection){
+            new_sel.color = SELECTED_NODE_COLOR;
+        }
         self.selected = new_selection;
     }
     pub fn reset(&mut self){
         self.nodes.clear();
-        self.nodes = vec![Node::new(Shape::Circle,0.5, 0.5); 1];
-        self.nodes[0].color = SELECTED_NODE_COLOR;
+        self.nodes = HashMap::new();
+        let mut root: Node = Node::new(Shape::Circle,0.5, 0.5, 0, 0);
+        root.color = SELECTED_NODE_COLOR;
+        self.nodes.insert(0, root);
         self.selected = 0;
+        self.max_id = 0;
     }
 }

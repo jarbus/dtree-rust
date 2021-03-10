@@ -3,6 +3,7 @@ extern crate piston;
 extern crate graphics;
 extern crate opengl_graphics;
 
+use std::collections::HashMap;
 use glutin_window::GlutinWindow;
 use piston_window::*;
 use opengl_graphics::{GlGraphics, OpenGL};
@@ -48,8 +49,10 @@ fn main() {
                 Button::Keyboard(Key::O) => graph.add_child(),
                 // Clear all nodes on right click
                 Button::Mouse(MouseButton::Right) => graph.reset(),
-                Button::Keyboard(Key::K) => graph.select(graph.selected as i8 + 1),
-                Button::Keyboard(Key::J) => graph.select(graph.selected as i8 - 1),
+
+                Button::Keyboard(Key::K) => graph.select(-1),
+                Button::Keyboard(Key::H) => graph.select(1),
+                Button::Keyboard(Key::L) => graph.select(2),
                 _ => {},
             }
         }
