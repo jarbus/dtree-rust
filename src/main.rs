@@ -49,7 +49,6 @@ fn main() {
                 Button::Keyboard(Key::O) => graph.add_child(),
                 // Clear all nodes on right click
                 Button::Mouse(MouseButton::Right) => graph.reset(),
-
                 Button::Keyboard(Key::K) => graph.select(-1),
                 Button::Keyboard(Key::H) => graph.select(1),
                 Button::Keyboard(Key::L) => graph.select(2),

@@ -1,18 +1,31 @@
+/// An enum of all the different Shapes a node can take.
+/// Currently limited to Rectangles and Circles
 #[derive(Clone)]
 pub enum Shape {
     Rect,
     Circle
 }
 
+/// A node in the dtree. Each node has a unique id, indiciating what the number of nodes generated
+/// before it. The root of the tree cannot be deleted, and will always have id 0.
 #[derive(Clone)]
 pub struct Node {
+   /// shape    - the type of shape to draw
    pub shape: Shape,
+   /// color    - color to draw
    pub color: Color,
+   /// position - x,y position ranging [0,1]. Is multiplied by window size for drawing,
+   ///            so (0.5, 0.5) would be the center of any window size
    pub pos: [f64; 2],
+   /// rot      - rotation of node in radians, currently not used
    pub rot: f32,
+   /// size     - scalar value indicating size of node in pixels
    pub size: f64,
+   /// id       - The id of the node, i.e. the number of unique nodes generated before it
    pub id: usize,
+   /// parent   - The id of the parent node
    pub parent: usize,
+   /// children - A vector of all children ids
    pub children: Vec<usize>,
 }
 
