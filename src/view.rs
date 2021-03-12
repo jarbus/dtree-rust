@@ -1,7 +1,5 @@
+#[derive(Clone)]
 pub enum View {
-    threegen,
-    fivegen,
+    ThreeGen,
+    FiveGen,
     }
-
-pub fn draw_view(graph: &Graph, view: View){
-}

@@ -13,6 +13,7 @@ use piston::event_loop::{EventSettings, Events};
 include!("color.rs");
 include!("node.rs");
 include!("graph.rs");
+include!("view.rs");
 
 
 fn main() {
@@ -26,13 +27,14 @@ fn main() {
     //let mut cursor: [f64; 2] = [0.0, 0.0];            // cursor position in pixel coordinates
     //let mut window_size: [f64; 2] = [0.0,0.0];        // Resolution, updated each tick
     // Steps through each type of window event
+    let view = View::ThreeGen;
     while let Some(e) = events.next(&mut window) {
         // Draws screen on render event
         if let Some(r) = e.render_args() {
             //window_size = r.viewport().window_size;
             gl.draw(r.viewport(), |c, gl| {
                 graphics::clear(color::BLACK, gl);    // clear screen
-                graph.draw(c,gl);                     // render graph
+                graph.draw_view(c,gl, &view);                     // render graph
             });
         }
         //if let Some(resize_event) = e.resize_args() { // update window_size every
