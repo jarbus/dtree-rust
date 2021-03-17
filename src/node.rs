@@ -36,6 +36,7 @@ impl Node{
             }
         }
     }
+
     pub fn new(start_shape: Shape, node_id: usize, parent_node: usize) -> Node {
         Node {
             shape: start_shape,

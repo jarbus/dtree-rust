@@ -25,11 +25,10 @@ impl Graph{
                 // Draw selected node in the center
                 self.nodes[&self.selected].draw(c,gl, [0.5, 0.5]);
                 // Draw each child in a row from left to right
-                for (i, child_id) in self.nodes[&self.selected].children.iter().enumerate() {
-                    self.nodes[&child_id].draw(c,gl, [(i as f64) *0.1 + 0.3, 0.7]);
-                };
-                // Draw a parent if parent is not selected node
-                // Should only occur for root node
+                self.draw_children(c, gl, self.selected, [0.5, 0.5], [0.1,0.9]);
+
+                // Draw a parent if parent != selected, which only
+                // occurs for the root
                 let parent = self.nodes[&self.selected].parent;
                 if parent != self.selected {
                     self.nodes[&parent].draw(c, gl, [0.5, 0.2]);
@@ -37,6 +36,24 @@ impl Graph{
             },
             View::FiveGen => {},
         }
+    }
+
+    pub fn draw_children(&self, c: graphics::context::Context, gl: &mut GlGraphics, node_id: usize, position: [f64; 2], boundaries: [f64; 2])
+    {
+        if self.nodes[&node_id].children.len() == 0 {return};
+        // if odd, draw middle child in center, then split the other nodes even spaced on their
+        // respective sides
+        //if self.nodes[&node_id].children.len() % 2 == 1 {
+
+        //}
+        // if even, draw all nodes evenly spaced centered around position
+        //else {
+        let seperation_length = (boundaries[1] - boundaries[0]) / (self.nodes[&node_id].children.len() + 1) as f64;
+        for (i, id) in self.nodes[&node_id].children.iter().enumerate() {
+            self.nodes[&id].draw(c, gl, [boundaries[0] + ((i+1) as f64 * seperation_length), position[1] + 0.2]);
+        // }
+        }
+
     }
 
     /// Adds child to currently selected node

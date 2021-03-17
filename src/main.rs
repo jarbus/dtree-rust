@@ -1,4 +1,3 @@
-// TODO turn node vector into hashmap and change traversal to go between children and parents
 extern crate piston;
 extern crate graphics;
 extern crate opengl_graphics;
@@ -51,9 +50,13 @@ fn main() {
                 Button::Keyboard(Key::O) => graph.add_child(),
                 // Clear all nodes on right click
                 Button::Mouse(MouseButton::Right) => graph.reset(),
+                // Select Parent Node
                 Button::Keyboard(Key::K) => graph.select(-1),
+                // Select left child
                 Button::Keyboard(Key::H) => graph.select(1),
+                // Select right child
                 Button::Keyboard(Key::L) => graph.select(2),
+                Button::Keyboard(Key::Q) => break,
                 _ => {},
             }
         }
