@@ -10,35 +10,43 @@ pub enum Shape {
 /// before it. The root of the tree cannot be deleted, and will always have id 0.
 #[derive(Clone)]
 pub struct Node {
-   /// shape    - the type of shape to draw
-   pub shape: Shape,
-   /// color    - color to draw
-   pub color: Color,
-   /// size     - scalar value indicating size of node in pixels
-   pub size: f64,
-   /// id       - The id of the node, i.e. the number of unique nodes generated before it
-   pub id: usize,
-   /// parent   - The id of the parent node
-   pub parent: usize,
-   /// children - A vector of all children ids
-   pub children: Vec<usize>,
+    /// The position of the node, determined by the view of the graph.
+    /// In terms of pixels
+    pub render_pos: [f64;2],
+    /// shape    - the type of shape to draw
+    pub shape: Shape,
+    /// color    - color to draw
+    pub color: Color,
+    /// size     - scalar value indicating size of node in pixels
+    pub size: f64,
+    /// id       - The id of the node, i.e. the number of unique nodes generated before it
+    pub id: usize,
+    /// parent   - The id of the parent node
+    pub parent: usize,
+    /// children - A vector of all children ids
+    pub children: Vec<usize>,
 }
 
 impl Node{
-    pub fn draw(&self, c: graphics::context::Context, gl: &mut GlGraphics, position: [f64; 2]) {
+    /// Renders node at :position: * window_size, where :position: is between 0 and 1
+    pub fn draw(&mut self, c: graphics::context::Context, gl: &mut GlGraphics, position: [f64; 2]) {
         if let Some(v) = c.viewport{
-            let x0 = (position[0] * v.window_size[0]) - (self.size/2.0);
-            let y0 = (position[1] * v.window_size[1]) - (self.size/2.0);
+            let x = (position[0] * v.window_size[0]) - (self.size/2.0);
+            let y = (position[1] * v.window_size[1]) - (self.size/2.0);
+
+            self.render_pos = [x, y];
 
             match self.shape {
-                Shape::Rect => graphics::Rectangle::new(self.color).draw([x0, y0,self.size, self.size], &c.draw_state, c.transform, gl),
-                Shape::Circle => graphics::CircleArc::new(self.color,10.0,0.0,2.0 * std::f64::consts::PI).draw([x0,y0,self.size,self.size], &c.draw_state, c.transform, gl),
+                Shape::Rect => graphics::Rectangle::new(self.color).draw([x, y,self.size, self.size], &c.draw_state, c.transform, gl),
+                Shape::Circle => graphics::CircleArc::new(self.color,10.0,0.0,2.0 * std::f64::consts::PI).draw([x,y,self.size,self.size], &c.draw_state, c.transform, gl),
             }
         }
     }
 
+    /// Creates a new node object
     pub fn new(start_shape: Shape, node_id: usize, parent_node: usize) -> Node {
         Node {
+            render_pos: [0.0, 0.0],
             shape: start_shape,
             color: WHITE,
             size: 100.0,

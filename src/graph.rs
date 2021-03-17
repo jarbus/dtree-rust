@@ -22,23 +22,37 @@ impl Graph{
         match view {
             // ThreeGen displays selected node, parent, and all children
             View::ThreeGen => {
-                // Draw selected node in the center
-                self.nodes[&self.selected].draw(c,gl, [0.5, 0.5]);
+                // Draw selected node in the center and update position
+                if let Some(sel) = self.nodes.get_mut(&self.selected){
+                    sel.draw(c,gl, [0.5, 0.5]);
+                }
                 // Draw each child in a row from left to right
                 self.draw_children(c, gl, self.selected, [0.5, 0.5], [0.1,0.9]);
 
                 // Draw a parent if parent != selected, which only
                 // occurs for the root
-                let parent = self.nodes[&self.selected].parent;
-                if parent != self.selected {
-                    self.nodes[&parent].draw(c, gl, [0.5, 0.2]);
+                let parent_id = self.nodes[&self.selected].parent;
+                let sel_render_pos = self.nodes[&self.selected].render_pos;
+                let par_render_pos = self.nodes[&parent_id].render_pos;
+                if parent_id != self.selected{
+                    if let Some(parent_node) = self.nodes.get_mut(&parent_id){
+                        parent_node.draw(c, gl, [0.5, 0.2]);
                     }
+                }
+                let psline = piston_window::Line::new(WHITE,20.0);
+                println!("{} {} {} {}", sel_render_pos[0], sel_render_pos[1], par_render_pos[0], par_render_pos[1]);
+                psline.draw_from_to(sel_render_pos,
+                                    par_render_pos,
+                                    &c.draw_state, c.transform, gl)
             },
             View::FiveGen => {},
         }
     }
 
-    pub fn draw_children(&self, c: graphics::context::Context, gl: &mut GlGraphics, node_id: usize, position: [f64; 2], boundaries: [f64; 2])
+    /// Draw children of node :node_id: which is located at :position:
+    /// between :boundary[0]: and :boundary[1]:, where each boundary
+    /// in between [0,1]
+    pub fn draw_children(&mut self, c: graphics::context::Context, gl: &mut GlGraphics, node_id: usize, position: [f64; 2], boundaries: [f64; 2])
     {
         if self.nodes[&node_id].children.len() == 0 {return};
         // if odd, draw middle child in center, then split the other nodes even spaced on their
@@ -49,12 +63,15 @@ impl Graph{
         // if even, draw all nodes evenly spaced centered around position
         //else {
         let seperation_length = (boundaries[1] - boundaries[0]) / (self.nodes[&node_id].children.len() + 1) as f64;
-        for (i, id) in self.nodes[&node_id].children.iter().enumerate() {
-            self.nodes[&id].draw(c, gl, [boundaries[0] + ((i+1) as f64 * seperation_length), position[1] + 0.2]);
-        // }
+        let children =  self.nodes[&node_id].children.clone();
+        for (i, id) in children.iter().enumerate() {
+                if let Some(child) = self.nodes.get_mut(&id){
+                    child.draw(c, gl, [boundaries[0] + ((i+1) as f64 * seperation_length), position[1] + 0.2]);
+            }
         }
-
+        // }
     }
+
 
     /// Adds child to currently selected node
     pub fn add_child(&mut self){
