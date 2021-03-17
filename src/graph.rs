@@ -39,11 +39,10 @@ impl Graph{
                         parent_node.draw(c, gl, [0.5, 0.2]);
                     }
                 }
-                let psline = piston_window::Line::new(WHITE,20.0);
-                println!("{} {} {} {}", sel_render_pos[0], sel_render_pos[1], par_render_pos[0], par_render_pos[1]);
-                psline.draw_from_to(sel_render_pos,
-                                    par_render_pos,
-                                    &c.draw_state, c.transform, gl)
+                piston_window::Line::new(WHITE,10.0)
+                    .draw_from_to(sel_render_pos,
+                                  par_render_pos,
+                                  &c.draw_state, c.transform, gl);
             },
             View::FiveGen => {},
         }
@@ -54,19 +53,20 @@ impl Graph{
     /// in between [0,1]
     pub fn draw_children(&mut self, c: graphics::context::Context, gl: &mut GlGraphics, node_id: usize, position: [f64; 2], boundaries: [f64; 2])
     {
-        if self.nodes[&node_id].children.len() == 0 {return};
-        // if odd, draw middle child in center, then split the other nodes even spaced on their
-        // respective sides
-        //if self.nodes[&node_id].children.len() % 2 == 1 {
+        let node = &self.nodes[&node_id].clone();
+        if node.children.len() == 0 {return};
 
-        //}
         // if even, draw all nodes evenly spaced centered around position
-        //else {
-        let seperation_length = (boundaries[1] - boundaries[0]) / (self.nodes[&node_id].children.len() + 1) as f64;
-        let children =  self.nodes[&node_id].children.clone();
-        for (i, id) in children.iter().enumerate() {
+        let seperation_length = (boundaries[1] - boundaries[0]) / (node.children.len() + 1) as f64;
+        for (i, id) in node.children.iter().enumerate() {
                 if let Some(child) = self.nodes.get_mut(&id){
                     child.draw(c, gl, [boundaries[0] + ((i+1) as f64 * seperation_length), position[1] + 0.2]);
+
+                    piston_window::Line::new(WHITE,10.0)
+                        .draw_from_to(node.render_pos,
+                                    child.render_pos,
+                                    &c.draw_state, c.transform, gl);
+
             }
         }
         // }

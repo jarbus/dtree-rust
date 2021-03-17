@@ -34,7 +34,7 @@ impl Node{
             let x = (position[0] * v.window_size[0]) - (self.size/2.0);
             let y = (position[1] * v.window_size[1]) - (self.size/2.0);
 
-            self.render_pos = [x, y];
+            self.render_pos = [position[0] * v.window_size[0], position[1] * v.window_size[1] ];
 
             match self.shape {
                 Shape::Rect => graphics::Rectangle::new(self.color).draw([x, y,self.size, self.size], &c.draw_state, c.transform, gl),
