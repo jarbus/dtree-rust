@@ -43,7 +43,7 @@ impl Graph{
                 piston_window::Line::new(WHITE,10.0)
                     .draw_from_to(sel_render_pos,
                                   par_render_pos,
-                                  &r.c.draw_state, r.c.transform, &mut r.gl);
+                                  &r.c.draw_state, r.c.transform,  r.gl);
             },
             View::FiveGen => {},
         }

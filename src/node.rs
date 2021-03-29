@@ -46,8 +46,8 @@ impl Node{
             //).unwrap();
 
             match self.shape {
-                Shape::Rect => graphics::Rectangle::new(self.color).draw([x, y,self.size, self.size], &r.c.draw_state, transform, &mut r.gl),
-                Shape::Circle => graphics::CircleArc::new(self.color,10.0,0.0,2.0 * std::f64::consts::PI).draw([x,y,self.size,self.size], &r.c.draw_state, transform, &mut r.gl),
+                Shape::Rect => graphics::Rectangle::new(self.color).draw([x, y,self.size, self.size], &r.c.draw_state, transform, r.gl),
+                Shape::Circle => graphics::CircleArc::new(self.color,10.0,0.0,2.0 * std::f64::consts::PI).draw([x,y,self.size,self.size], &r.c.draw_state, transform, r.gl),
             }
         }
     }

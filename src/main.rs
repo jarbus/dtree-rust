@@ -47,21 +47,13 @@ fn main() {
                 graphics::clear(color::BLACK, gl);    // clear screen
 
                  // handle text
-                 window.draw_2d(&e, |c, g2, device|{
+                 window.draw_2d(&e, |c2, g2, device|{
 
                     let mut renderer = Renderer {c: c, gl: gl, g2d: g2, glyphs: glyphs, view: view};
 
-                    let transform = c.transform.trans(10.0, 100.0);
+                    //let transform = c.transform.trans(10.0, 100.0);
 
-                    //clear([0.0, 0.0, 0.0, 1.0], g);
-                    // text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32).draw(
-                    //     "Hello world!",
-                    //     &mut glyphs,
-                    //     &c.draw_state,
-                    //     transform, g
-                    // ).unwrap();
-
-                    graph.draw_view(&mut renderer); // render graph
+                    //graph.draw_view(&mut renderer); // render graph
                 glyphs.factory.encoder.flush(device);
                 });
 
