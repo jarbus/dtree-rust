@@ -133,6 +133,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "cmake"
+version = "0.1.45"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eb6210b637171dfba4cda12e579ac6dc73f5165ad56133e5d72ef3131f320855"
+dependencies = [
+ "cc",
+]
+
+[[package]]
 name = "cocoa"
 version = "0.23.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -417,6 +426,7 @@ dependencies = [
  "find_folder",
  "gfx",
  "gfx_device_gl",
+ "gfx_text",
  "image",
  "piston",
  "piston-ai_behavior",
@@ -464,6 +474,28 @@ name = "foreign-types-shared"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b"
+
+[[package]]
+name = "freetype-rs"
+version = "0.27.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9593b75434a847f1b0d1cd97fb09aaf4efa4f610db157f9725ff92a40328cc53"
+dependencies = [
+ "bitflags",
+ "freetype-sys",
+ "libc",
+]
+
+[[package]]
+name = "freetype-sys"
+version = "0.14.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b67cedeffcf3d18fd38769bb9323b374f09441934a0f9096b9d33efddf920fc7"
+dependencies = [
+ "cmake",
+ "libc",
+ "pkg-config",
+]
 
 [[package]]
 name = "fuchsia-cprng"
@@ -540,6 +572,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2d38164670920cfb7491bc0cf6f49f0554bd1c44cdbedc6c78d2bf91691ff5e"
 dependencies = [
  "gl_generator 0.14.0",
+]
+
+[[package]]
+name = "gfx_text"
+version = "0.28.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25ee436b77cf034752fadff2fe565e91e8b191e9b503bb0011393a1402723b77"
+dependencies = [
+ "freetype-rs",
+ "gfx",
 ]
 
 [[package]]

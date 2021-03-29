@@ -29,16 +29,25 @@ pub struct Node {
 
 impl Node{
     /// Renders node at :position: * window_size, where :position: is between 0 and 1
-    pub fn draw(&mut self, c: graphics::context::Context, gl: &mut GlGraphics, position: [f64; 2]) {
-        if let Some(v) = c.viewport{
+    pub fn draw(&mut self, r: &mut Renderer, position: [f64; 2], text: Option<String>) {
+        if let Some(v) = r.c.viewport{
             let x = (position[0] * v.window_size[0]) - (self.size/2.0);
             let y = (position[1] * v.window_size[1]) - (self.size/2.0);
 
             self.render_pos = [position[0] * v.window_size[0], position[1] * v.window_size[1] ];
+            let transform = r.c.transform.trans(self.render_pos[0],self.render_pos[1]);
+
+
+            //text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32).draw(
+            //    "node world!",
+            //    glyphs,
+            //    &c.draw_state,
+            //    transform, gl
+            //).unwrap();
 
             match self.shape {
-                Shape::Rect => graphics::Rectangle::new(self.color).draw([x, y,self.size, self.size], &c.draw_state, c.transform, gl),
-                Shape::Circle => graphics::CircleArc::new(self.color,10.0,0.0,2.0 * std::f64::consts::PI).draw([x,y,self.size,self.size], &c.draw_state, c.transform, gl),
+                Shape::Rect => graphics::Rectangle::new(self.color).draw([x, y,self.size, self.size], &r.c.draw_state, transform, &mut r.gl),
+                Shape::Circle => graphics::CircleArc::new(self.color,10.0,0.0,2.0 * std::f64::consts::PI).draw([x,y,self.size,self.size], &r.c.draw_state, transform, &mut r.gl),
             }
         }
     }

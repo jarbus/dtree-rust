@@ -1,47 +1,75 @@
 extern crate piston;
 extern crate graphics;
 extern crate opengl_graphics;
+extern crate find_folder;
+
+include!("graph.rs");
+include!("color.rs");
+include!("node.rs");
+include!("view.rs");
+include!("mode.rs");
+include!("renderer.rs");
+
 
 use std::collections::HashMap;
-use glutin_window::GlutinWindow;
 use piston_window::*;
+
+
+
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::input::{RenderEvent, PressEvent, Button, Key, MouseButton};
 use piston::event_loop::{EventSettings, Events};
 
-include!("color.rs");
-include!("node.rs");
-include!("graph.rs");
-include!("view.rs");
 
 
 fn main() {
 
     let opengl = OpenGL::V3_2;
     let settings = WindowSettings::new("dtree", [512; 2]).exit_on_esc(true);
-    let mut window: GlutinWindow = settings.build().expect("Could not create window");
+    let mut window: PistonWindow = settings.build().expect("Could not create window");
+    let assets = find_folder::Search::ParentsThenKids(3, 3)
+        .for_folder("assets").unwrap();
+
+    println!("{:?}", assets);
+    let mut glyphs: Glyphs = window.load_font(assets.join("FiraSans-Regular.ttf")).unwrap();
+
     let mut gl = GlGraphics::new(opengl);
     let mut graph: Graph = Graph::new();
     let mut events = Events::new(EventSettings::new());
-    //let mut cursor: [f64; 2] = [0.0, 0.0];            // cursor position in pixel coordinates
-    //let mut window_size: [f64; 2] = [0.0,0.0];        // Resolution, updated each tick
     // Steps through each type of window event
     let view = View::ThreeGen;
     while let Some(e) = events.next(&mut window) {
+
         // Draws screen on render event
         if let Some(r) = e.render_args() {
-            //window_size = r.viewport().window_size;
+            // draw nodes
             gl.draw(r.viewport(), |c, gl| {
                 graphics::clear(color::BLACK, gl);    // clear screen
-                graph.draw_view(c,gl, &view);                     // render graph
+
+                 // handle text
+                 window.draw_2d(&e, |c, g2, device|{
+
+                    let mut renderer = Renderer {c: c, gl: gl, g2d: g2, glyphs: glyphs, view: view};
+
+                    let transform = c.transform.trans(10.0, 100.0);
+
+                    //clear([0.0, 0.0, 0.0, 1.0], g);
+                    // text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32).draw(
+                    //     "Hello world!",
+                    //     &mut glyphs,
+                    //     &c.draw_state,
+                    //     transform, g
+                    // ).unwrap();
+
+                    graph.draw_view(&mut renderer); // render graph
+                glyphs.factory.encoder.flush(device);
+                });
+
             });
+
         }
-        //if let Some(resize_event) = e.resize_args() { // update window_size every
-        //    window_size = resize_event.window_size;   // time it's changed
-        //}
-        //if let Some(pos) = e.mouse_cursor_args() {
-        //    cursor = pos;                             // get new cursor position each tick
-        //}
+        //this will print out each character on a new line
+        e.text(|text| println!("Typed '{}'", text));
 
         if let Some(button) = e.press_args() {
 
@@ -56,6 +84,9 @@ fn main() {
                 Button::Keyboard(Key::H) => graph.select(1),
                 // Select right child
                 Button::Keyboard(Key::L) => graph.select(2),
+
+                Button::Keyboard(Key::T) => graph.toggle_travel_mode(),
+                Button::Keyboard(Key::E) => graph.edit_node(),
                 Button::Keyboard(Key::Q) => break,
                 _ => {},
             }
