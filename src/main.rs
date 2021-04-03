@@ -24,7 +24,8 @@ use piston::event_loop::{EventSettings, Events};
 
 fn main() {
 
-    let opengl = OpenGL::V3_2;
+    //let opengl = OpenGL::V3_2;
+    //let gl = GlGraphics::new(opengl);
     let settings = WindowSettings::new("dtree", [512; 2]).exit_on_esc(true);
     let mut window: PistonWindow = settings.build().expect("Could not create window");
     let assets = find_folder::Search::ParentsThenKids(3, 3)
@@ -33,7 +34,6 @@ fn main() {
     println!("{:?}", assets);
     let mut glyphs: Glyphs = window.load_font(assets.join("FiraSans-Regular.ttf")).unwrap();
 
-    let gl = GlGraphics::new(opengl);
     let mut graph: Graph = Graph::new();
     let mut events = Events::new(EventSettings::new());
     // Steps through each type of window event
@@ -43,7 +43,7 @@ fn main() {
         // draw nodes
         window.draw_2d(&e, |c, g, device| {
           graphics::clear(color::BLACK, g);    // clear screen
-          let mut renderer = Renderer::new(c, g, &glyphs, &view);
+          let mut renderer = Renderer::new(c, g, &mut glyphs, &view);
           graph.draw_view(&mut renderer);      // render graph
           glyphs.factory.encoder.flush(device);
         });

@@ -23,27 +23,35 @@ impl Graph{
         match r.view {
             // ThreeGen displays selected node, parent, and all children
             View::ThreeGen => {
+
+
+
+
                 // Draw selected node in the center and update position
                 if let Some(sel) = self.nodes.get_mut(&self.selected){
-                    sel.draw(r, [0.5, 0.5], None);
+                    sel.draw(r, [0.5, 0.5], Some(String::from("sel")));
                 }
-                // Draw each child in a row from left to right
-                self.draw_children(r, self.selected, [0.5, 0.5], [0.1,0.9]);
+
 
                 // Draw a parent if parent != selected, which only
                 // occurs for the root
                 let parent_id = self.nodes[&self.selected].parent;
                 let sel_render_pos = self.nodes[&self.selected].render_pos;
                 let par_render_pos = self.nodes[&parent_id].render_pos;
-                if parent_id != self.selected{
-                    if let Some(parent_node) = self.nodes.get_mut(&parent_id){
-                        parent_node.draw(r, [0.5, 0.2],None);
-                    }
-                }
+
                 piston_window::Line::new(WHITE,10.0)
                     .draw_from_to(sel_render_pos,
                                   par_render_pos,
                                   &r.c.draw_state, r.c.transform,  r.gl);
+
+                if parent_id != self.selected{
+                    if let Some(parent_node) = self.nodes.get_mut(&parent_id){
+                        parent_node.draw(r, [0.5, 0.2],Some(String::from("parent")));
+                    }
+                }
+
+                // Draw each child in a row from left to right
+                self.draw_children(r, self.selected, [0.5, 0.5], [0.1,0.9]);
             },
             View::FiveGen => {},
         }
@@ -62,12 +70,14 @@ impl Graph{
         let seperation_length = (boundaries[1] - boundaries[0]) / (node.children.len() + 1) as f64;
         for (i, id) in node.children.iter().enumerate() {
                 if let Some(child) = self.nodes.get_mut(&id){
-                    child.draw(r, [boundaries[0] + ((i+1) as f64 * seperation_length), position[1] + 0.2], None);
+
+                    child.draw(r, [boundaries[0] + ((i+1) as f64 * seperation_length), position[1] + 0.2], Some(String::from("test")));
 
                     piston_window::Line::new(WHITE,10.0)
                         .draw_from_to(node.render_pos,
                                     child.render_pos,
                                     &r.c.draw_state, r.c.transform, r.gl);
+
 
             }
         }
