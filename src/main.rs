@@ -33,24 +33,21 @@ fn main() {
     println!("{:?}", assets);
     let mut glyphs: Glyphs = window.load_font(assets.join("FiraSans-Regular.ttf")).unwrap();
 
-    let mut gl = GlGraphics::new(opengl);
+    let gl = GlGraphics::new(opengl);
     let mut graph: Graph = Graph::new();
     let mut events = Events::new(EventSettings::new());
     // Steps through each type of window event
     let view = View::ThreeGen;
     while let Some(e) = events.next(&mut window) {
 
-        // Draws screen on render event
-        if let Some(r) = e.render_args() {
-            // draw nodes
-            window.draw_2d(&e, |c, g, device| {
-                graphics::clear(color::BLACK, g);    // clear screen
-                let renderer = Renderer::new(c, g, &glyphs, &view);
-                graph.draw_view(& renderer);      // render graph
-                glyphs.factory.encoder.flush(device);
-            });
+        // draw nodes
+        window.draw_2d(&e, |c, g, device| {
+          graphics::clear(color::BLACK, g);    // clear screen
+          let mut renderer = Renderer::new(c, g, &glyphs, &view);
+          graph.draw_view(&mut renderer);      // render graph
+          glyphs.factory.encoder.flush(device);
+        });
 
-        }
         //this will print out each character on a new line
         e.text(|text| println!("Typed '{}'", text));
 

@@ -18,7 +18,7 @@ impl Graph{
     }
 
     /// Renders the graph with the algorithm associated with the parameter :view:
-    pub fn draw_view(&mut self, r: &Renderer){
+    pub fn draw_view(&mut self, r: &mut Renderer){
 
         match r.view {
             // ThreeGen displays selected node, parent, and all children
@@ -52,7 +52,7 @@ impl Graph{
     /// Draw children of node :node_id: which is located at :position:
     /// between :boundary[0]: and :boundary[1]:, where each boundary
     /// in between [0,1]
-    pub fn draw_children(&mut self, r: &Renderer, node_id: usize, position: [f64; 2], boundaries: [f64; 2])
+    pub fn draw_children(&mut self, r: &mut Renderer, node_id: usize, position: [f64; 2], boundaries: [f64; 2])
     {
         let node = &self.nodes[&node_id].clone();
         if node.children.len() == 0 {return};

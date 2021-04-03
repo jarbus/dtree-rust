@@ -35,15 +35,8 @@ impl Node{
             let y = (position[1] * v.window_size[1]) - (self.size/2.0);
 
             self.render_pos = [position[0] * v.window_size[0], position[1] * v.window_size[1] ];
-            let transform = r.c.transform.trans(self.render_pos[0],self.render_pos[1]);
+            let transform = r.c.transform;
 
-
-            //text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32).draw(
-            //    "node world!",
-            //    glyphs,
-            //    &c.draw_state,
-            //    transform, gl
-            //).unwrap();
 
             match self.shape {
                 Shape::Rect => graphics::Rectangle::new(self.color).draw([x, y,self.size, self.size], &r.c.draw_state, transform, r.gl),
