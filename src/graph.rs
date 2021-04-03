@@ -29,7 +29,7 @@ impl Graph{
 
                 // Draw selected node in the center and update position
                 if let Some(sel) = self.nodes.get_mut(&self.selected){
-                    sel.draw(r, [0.5, 0.5], Some(String::from("sel")));
+                    sel.draw(r, [0.5, 0.5], Some(String::from("sel")), self.mode.clone());
                 }
 
 
@@ -46,7 +46,7 @@ impl Graph{
 
                 if parent_id != self.selected{
                     if let Some(parent_node) = self.nodes.get_mut(&parent_id){
-                        parent_node.draw(r, [0.5, 0.2],Some(String::from("parent")));
+                        parent_node.draw(r, [0.5, 0.2],Some(String::from("parent")), self.mode.clone());
                     }
                 }
 
@@ -71,7 +71,7 @@ impl Graph{
         for (i, id) in node.children.iter().enumerate() {
                 if let Some(child) = self.nodes.get_mut(&id){
 
-                    child.draw(r, [boundaries[0] + ((i+1) as f64 * seperation_length), position[1] + 0.2], Some(String::from("test")));
+                    child.draw(r, [boundaries[0] + ((i+1) as f64 * seperation_length), position[1] + 0.2], Some(String::from("test")), self.mode.clone());
 
                     piston_window::Line::new(WHITE,10.0)
                         .draw_from_to(node.render_pos,

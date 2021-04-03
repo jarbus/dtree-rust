@@ -29,7 +29,7 @@ pub struct Node {
 
 impl Node{
     /// Renders node at :position: * window_size, where :position: is between 0 and 1
-    pub fn draw(&mut self, r: &mut Renderer, position: [f64; 2], text: Option<String>) {
+    pub fn draw(&mut self, r: &mut Renderer, position: [f64; 2], text: Option<String>, mode: Mode) {
         if let Some(v) = r.c.viewport{
             let x = (position[0] * v.window_size[0]) - (self.size/2.0);
             let y = (position[1] * v.window_size[1]) - (self.size/2.0);
@@ -41,17 +41,19 @@ impl Node{
                 Shape::Circle => graphics::CircleArc::new(self.color,10.0,0.0,2.0 * std::f64::consts::PI).draw([x,y,self.size,self.size], &r.c.draw_state, r.c.transform, r.gl),
             }
 
-            if let Some(t) = text {
-                let text_trans = r.c.transform.trans(self.render_pos[0], self.render_pos[1]);
-                text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32).draw(
-                    &t,
-                    r.glyphs,
-                    &r.c.draw_state,
-                    text_trans,
-                    r.gl
-                ).unwrap();
+            match (text, mode) {
+                (Some(t), Mode::Travel) => {
+                    let text_trans = r.c.transform.trans(self.render_pos[0], self.render_pos[1]);
+                    text::Text::new_color([0.0, 1.0, 0.0, 1.0], 32).draw(
+                        &t,
+                        r.glyphs,
+                        &r.c.draw_state,
+                        text_trans,
+                        r.gl
+                    ).unwrap();
+                }
+                _ => {},
             }
-
 
         }
     }
