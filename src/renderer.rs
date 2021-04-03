@@ -1,8 +1,18 @@
-pub struct Renderer<'a:'b,'b > {
+pub struct Renderer<'a, 'b>{
 
     pub c: graphics::context::Context,
-    pub gl: &'a mut GlGraphics,
-    pub g2d: &'b mut G2d<'b>,
-    pub glyphs: Glyphs,
-    pub view: View,
+    pub gl: &'b mut G2d<'a>,
+    pub glyphs:&'b Glyphs,
+    pub view:&'b View,
+}
+
+impl <'a, 'b> Renderer <'a, 'b> {
+    pub fn new(
+         c: graphics::context::Context,
+         g: &'b mut G2d<'a>,
+         glyphs: &'b Glyphs,
+         view:&'b View,
+) -> Renderer<'a, 'b> {
+        Renderer {c, gl:g, glyphs, view}
+    }
 }

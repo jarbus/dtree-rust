@@ -43,20 +43,11 @@ fn main() {
         // Draws screen on render event
         if let Some(r) = e.render_args() {
             // draw nodes
-            gl.draw(r.viewport(), |c, gl| {
-                graphics::clear(color::BLACK, gl);    // clear screen
-
-                 // handle text
-                 window.draw_2d(&e, |c2, g2, device|{
-
-                    let mut renderer = Renderer {c: c, gl: gl, g2d: g2, glyphs: glyphs, view: view};
-
-                    //let transform = c.transform.trans(10.0, 100.0);
-
-                    //graph.draw_view(&mut renderer); // render graph
+            window.draw_2d(&e, |c, g, device| {
+                graphics::clear(color::BLACK, g);    // clear screen
+                let renderer = Renderer::new(c, g, &glyphs, &view);
+                graph.draw_view(& renderer);      // render graph
                 glyphs.factory.encoder.flush(device);
-                });
-
             });
 
         }
@@ -66,6 +57,7 @@ fn main() {
         if let Some(button) = e.press_args() {
 
             match button {
+
                 // Add new node to graph on left click at cursor position
                 Button::Keyboard(Key::O) => graph.add_child(),
                 // Clear all nodes on right click
