@@ -1,3 +1,7 @@
+use piston_window::*;
+#[path = "view.rs"]
+use crate::view::View;
+
 pub struct Renderer<'a, 'b>{
 
     pub c: graphics::context::Context,

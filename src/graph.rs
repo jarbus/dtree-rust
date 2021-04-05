@@ -1,3 +1,10 @@
+use crate::color::*;
+use crate::renderer::Renderer;
+use crate::mode::Mode;
+use crate::view::View;
+use crate::node::*;
+use std::collections::HashMap;
+
 #[derive(Clone)]
 pub struct Graph {
     pub nodes: HashMap<usize, Node>,

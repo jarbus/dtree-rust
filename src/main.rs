@@ -1,22 +1,16 @@
 extern crate piston;
 extern crate graphics;
-extern crate opengl_graphics;
 extern crate find_folder;
 
-include!("graph.rs");
-include!("color.rs");
-include!("node.rs");
-include!("view.rs");
-include!("mode.rs");
-include!("renderer.rs");
+mod mode;
+mod view;
+mod color;
+mod renderer;
+mod graph;
+mod node;
 
-
-use std::collections::HashMap;
 use piston_window::*;
 
-
-
-use opengl_graphics::{GlGraphics, OpenGL};
 use piston::input::{RenderEvent, PressEvent, Button, Key, MouseButton};
 use piston::event_loop::{EventSettings, Events};
 
@@ -34,16 +28,16 @@ fn main() {
     println!("{:?}", assets);
     let mut glyphs: Glyphs = window.load_font(assets.join("FiraSans-Regular.ttf")).unwrap();
 
-    let mut graph: Graph = Graph::new();
+    let mut graph: graph::Graph = graph::Graph::new();
     let mut events = Events::new(EventSettings::new());
     // Steps through each type of window event
-    let view = View::ThreeGen;
+    let view = view::View::ThreeGen;
     while let Some(e) = events.next(&mut window) {
 
         // draw nodes
         window.draw_2d(&e, |c, g, device| {
           graphics::clear(color::BLACK, g);    // clear screen
-          let mut renderer = Renderer::new(c, g, &mut glyphs, &view);
+          let mut renderer = renderer::Renderer::new(c, g, &mut glyphs, &view);
           graph.draw_view(&mut renderer);      // render graph
           glyphs.factory.encoder.flush(device);
         });
