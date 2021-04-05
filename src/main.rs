@@ -1,58 +1,66 @@
-// TODO turn node vector into hashmap and change traversal to go between children and parents
 extern crate piston;
 extern crate graphics;
-extern crate opengl_graphics;
+extern crate find_folder;
 
-use std::collections::HashMap;
-use glutin_window::GlutinWindow;
+mod mode;
+mod view;
+mod color;
+mod renderer;
+mod graph;
+mod node;
+
 use piston_window::*;
-use opengl_graphics::{GlGraphics, OpenGL};
+
 use piston::input::{RenderEvent, PressEvent, Button, Key, MouseButton};
 use piston::event_loop::{EventSettings, Events};
 
-include!("color.rs");
-include!("node.rs");
-include!("graph.rs");
 
 
 
 fn main() {
 
-    let opengl = OpenGL::V3_2;
+    //let opengl = OpenGL::V3_2;
+    //let gl = GlGraphics::new(opengl);
     let settings = WindowSettings::new("dtree", [512; 2]).exit_on_esc(true);
-    let mut window: GlutinWindow = settings.build().expect("Could not create window");
-    let mut gl = GlGraphics::new(opengl);
-    let mut graph: Graph = Graph::new();
-    let mut events = Events::new(EventSettings::new());
+    let mut window: PistonWindow = settings.build().expect("Could not create window");
+    let assets = find_folder::Search::ParentsThenKids(3, 3)
+        .for_folder("assets").unwrap();
 
-    //let mut cursor: [f64; 2] = [0.0, 0.0];            // cursor position in pixel coordinates
-    //let mut window_size: [f64; 2] = [0.0,0.0];        // Resolution, updated each tick
+    let mut graph: graph::Graph = graph::Graph::new();
+    let mut events = Events::new(EventSettings::new());
     // Steps through each type of window event
+    let view = view::View::ThreeGen;
     while let Some(e) = events.next(&mut window) {
-        // Draws screen on render event
-        if let Some(r) = e.render_args() {
-            gl.draw(r.viewport(), |c, gl| {
-                graphics::clear(color::BLACK, gl);    // clear screen
-                graph.draw(c,gl);                     // render graph
-            });
-        }
-        //if let Some(resize_event) = e.resize_args() { // update window_size every
-        //    window_size = resize_event.window_size;   // time it's changed
-        //}
-        //if let Some(pos) = e.mouse_cursor_args() {
-        //    cursor = pos;                             // get new cursor position each tick
-        //}
+
+        // draw nodes
+        window.draw_2d(&e, |c, g, device| {
+          graphics::clear(color::BLACK, g);    // clear screen
+          let mut renderer = renderer::Renderer::new(c, g, &mut glyphs, &view);
+          graph.draw_view(&mut renderer);      // render graph
+          glyphs.factory.encoder.flush(device);
+        });
+
+        //this will print out each character on a new line
+        e.text(|text| println!("Typed '{}'", text));
+
         if let Some(button) = e.press_args() {
 
             match button {
+
                 // Add new node to graph on left click at cursor position
                 Button::Keyboard(Key::O) => graph.add_child(),
                 // Clear all nodes on right click
                 Button::Mouse(MouseButton::Right) => graph.reset(),
-
+                // Select Parent Node
                 Button::Keyboard(Key::K) => graph.select(-1),
+                // Select left child
                 Button::Keyboard(Key::H) => graph.select(1),
+                // Select right child
                 Button::Keyboard(Key::L) => graph.select(2),
+
+                Button::Keyboard(Key::T) => graph.toggle_travel_mode(),
+                Button::Keyboard(Key::E) => graph.edit_node(),
+                Button::Keyboard(Key::Q) => break,
                 _ => {},
             }
         }
